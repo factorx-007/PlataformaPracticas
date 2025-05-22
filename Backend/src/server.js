@@ -1,12 +1,25 @@
+// server.js
 const app = require('./app');
 const dotenv = require('dotenv');
-const { connectDB } = require('./config/db');
+const { sequelize } = require('./models');
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 
-connectDB(); // ← conectar a MySQL
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Conexión a MySQL establecida con éxito');
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-});
+    await sequelize.sync({ alter: true });
+    console.log('📦 Modelos sincronizados con la base de datos');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ Error al iniciar el servidor:', err);
+  }
+};
+
+startServer();
