@@ -1,11 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const postulacionController = require('../controllers/postulacionController');
+const verifyToken = require('../middlewares/verifyToken');
 
-router.post('/', postulacionController.crearPostulacion);
+// 🔐 Rutas protegidas
+router.post('/', verifyToken, postulacionController.crearPostulacion);
+router.put('/:id', verifyToken, postulacionController.actualizarPostulacion);
+router.delete('/:id', verifyToken, postulacionController.eliminarPostulacion);
+
+// 🔓 Rutas públicas
 router.get('/', postulacionController.obtenerPostulaciones);
 router.get('/:id', postulacionController.obtenerPostulacionPorId);
-router.put('/:id', postulacionController.actualizarPostulacion);
-router.delete('/:id', postulacionController.eliminarPostulacion);
 
 module.exports = router;
