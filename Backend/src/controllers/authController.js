@@ -56,15 +56,27 @@ const login = async (req, res) => {
 // Ruta protegida para ver perfil
 const perfil = async (req, res) => {
   try {
+    // Asegúrate de que req.user.id exista y sea válido (viene del middleware verifyToken)
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'No autorizado o ID de usuario no encontrado en token' });
+    }
+
     const user = await Usuario.findByPk(req.user.id, {
-      attributes: ['nombre', 'email', 'rol'],
+      attributes: ['id', 'nombre', 'email', 'rol'],
     });
 
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado con el ID proporcionado' });
+    }
 
-    res.json({ mensaje: 'Perfil del usuario', user });
+    // Ahora 'user' contendrá el id
+    res.json({ 
+      mensaje: 'Perfil del usuario', 
+      user
+    });
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener perfil' });
+    console.error("Error en /perfil:", err); // Loguear el error en backend es útil
+    res.status(500).json({ error: 'Error al obtener perfil', detalle: err.message });
   }
 };
 
