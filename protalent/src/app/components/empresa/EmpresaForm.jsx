@@ -110,7 +110,7 @@ const EmpresaForm = ({ empresaId }) => {
             />
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 text-black">
             <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
               Descripción
             </label>
