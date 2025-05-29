@@ -11,7 +11,7 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ Conexión a MySQL establecida con éxito');
 
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log('📦 Modelos sincronizados con la base de datos');
 
     app.listen(PORT, () => {
