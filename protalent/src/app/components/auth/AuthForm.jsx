@@ -40,11 +40,11 @@ export default function AuthForm({ type }) {
         </h2>
         
         {type === 'register' && (
-          <div className="mb-6">
+          <div className="mb-6 text-black">
             <label className="block text-gray-700 text-sm font-medium mb-2">Nombre completo</label>
             <input 
               {...register('nombre')} 
-              className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors ${
+              className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors text-black ${
                 errors.nombre ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Ej: Juan Pérez"
@@ -60,7 +60,7 @@ export default function AuthForm({ type }) {
           <input 
             {...register('email')} 
             type="email"
-            className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors ${
+            className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors text-black ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="tucorreo@ejemplo.com"
@@ -75,7 +75,7 @@ export default function AuthForm({ type }) {
           <input 
             {...register('password')} 
             type="password"
-            className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors ${
+            className={`w-full px-4 py-3 rounded-lg border-2 focus:border-indigo-500 focus:outline-none transition-colors text-black ${
               errors.password ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="••••••••"
@@ -90,7 +90,7 @@ export default function AuthForm({ type }) {
             <label className="block text-gray-700 text-sm font-medium mb-2">Rol</label>
             <select 
               {...register('rol')} 
-              className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-indigo-500 focus:outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-indigo-500 focus:outline-none transition-colors text-black"
             >
               <option value="postulante">Postulante</option>
               <option value="empresa">Empresa</option>

@@ -8,7 +8,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="es">
       <body>
         <AuthProvider>
-          <main className="container mx-auto ">{children}</main>
+          <main >{children}</main>
         </AuthProvider>
       </body>
     </html>

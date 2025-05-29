@@ -1,4 +1,4 @@
-const { Postulacion } = require('../models');
+const { Postulacion, Oferta } = require('../models');
 
 exports.crearPostulacion = async (req, res) => {
   try {
@@ -11,7 +11,9 @@ exports.crearPostulacion = async (req, res) => {
 
 exports.obtenerPostulaciones = async (req, res) => {
   try {
-    const postulaciones = await Postulacion.findAll();
+    const postulaciones = await Postulacion.findAll({
+      include: [{ model: Oferta, attributes: ['id', 'titulo'] }]
+    });
     res.json(postulaciones);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener postulaciones' });
