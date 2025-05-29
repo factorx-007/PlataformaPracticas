@@ -1,5 +1,5 @@
 //src/services/authService
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { Usuario } = require('../models');
 const generateToken = require('../utils/generateToken');
 

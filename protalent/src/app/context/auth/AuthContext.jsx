@@ -15,16 +15,16 @@ export function AuthProvider({ children }) {
     // console.log("[AuthContext] useEffect ejecutándose");
 
     const initializeAuth = async () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       // console.log("[AuthContext] Token obtenido de localStorage:", token);
 
       if (token && token !== 'null' && token !== 'undefined') {
         // console.log("[AuthContext] Configurando token en Axios headers:", token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      } else {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
         // console.log("[AuthContext] No hay token válido en localStorage, eliminando header de Axios.");
-        delete api.defaults.headers.common['Authorization'];
-      }
+      delete api.defaults.headers.common['Authorization'];
+    }
 
       if (!api.defaults.headers.common['Authorization']) {
         // console.log("[AuthContext] No hay cabecera de autorización, estableciendo user a null.");
@@ -63,14 +63,14 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const { data } = await api.post('/api/auth/login', { email, password });
+    const { data } = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('token', data.token);
       api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
       // Después de configurar el token y header, el user se cargará mediante el efecto de un nuevo AuthProvider o una recarga
       // O podemos setearlo directamente aquí y luego redirigir
       setUser(data.user); 
       setLoading(false); // Establecer loading false después de un login exitoso y antes de redirigir
-      window.location.href = '/dashboard';
+    window.location.href = '/dashboard';
     } catch (error) {
       console.error("[AuthContext] Error en login:", error.response?.data || error.message);
       localStorage.removeItem('token'); // Limpiar token si el login falla
@@ -104,7 +104,7 @@ export function AuthProvider({ children }) {
     // console.log("[AuthContext] Ejecutando logout...");
     try {
       // La llamada al backend es opcional y para invalidar el token del lado del servidor si existe tal lógica
-      await api.post('/api/auth/logout');
+    await api.post('/api/auth/logout');
     } catch (error) {
       // console.error("[AuthContext] Error en llamada a /api/auth/logout (no crítico):");
     }

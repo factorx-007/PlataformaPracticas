@@ -81,7 +81,7 @@ export default function OfertaForm({ oferta }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 text-black">
       <div>
         <label htmlFor="titulo" className="block mb-1 font-medium">Título *</label>
         <input

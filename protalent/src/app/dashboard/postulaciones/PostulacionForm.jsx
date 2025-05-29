@@ -85,7 +85,7 @@ export default function PostulacionForm({ postulacion, ofertaId }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 text-black">
       <div>
         <label className="block mb-1 font-medium">Mensaje</label>
         <textarea
