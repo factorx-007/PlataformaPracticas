@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 // import { useRouter } from 'next/navigation'; // No se usará si window.location.href es la estrategia
 import api from '../../lib/axios';
 
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
