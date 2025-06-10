@@ -10,5 +10,9 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('postulante', 'empresa', 'admin'),
       allowNull: false,
     },
+    cv: {
+      type: DataTypes.STRING,       // Puedes guardar la ruta o URL del archivo PDF
+      allowNull: true,              // ✅ Opcional
+    }
   });
 };
