@@ -11,7 +11,10 @@ const inter = Inter({ subsets: ['latin'] });
 export default function DashboardLayout({ children }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} bg-gray-50 min-h-screen`}>
+      <body 
+        className={`${inter.className} bg-gray-50 min-h-screen`}
+        suppressHydrationWarning={true}
+      >
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <ModernNavbar />
