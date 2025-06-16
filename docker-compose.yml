@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:8080"
+    env_file:
+      - ./backend/.env  # Carga variables desde .env (NO en GitHub)
+    restart: unless-stopped
+
+  frontend:
+    build: ./protalent
+    ports:
+      - "3000:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Si usas MongoDB o MySQL, añade un servicio aquí
+  # db:
+  #   image: mongo:latest
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
+
+# volumes:
+#   mongo_data:
