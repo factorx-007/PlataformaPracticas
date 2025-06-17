@@ -69,8 +69,8 @@ export default function OfertasPage() {
       <div className="flex justify-center items-center w-full">
         <ImageSwiper 
           images={getOfertaImages()} 
-          cardWidth={300} 
-          cardHeight={400} 
+          cardWidth={400} 
+          cardHeight={500} 
           className="mb-8"
         >
           {(currentIndex) => (
@@ -89,64 +89,40 @@ export default function OfertasPage() {
 
   const renderOfertaGrid = () => {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {ofertas.map((oferta) => (
-          <motion.div
-            key={oferta.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <OfertaCard 
-              oferta={oferta} 
-              onPostular={handlePostular}
-              onEditar={handleEditar}
-            />
-          </motion.div>
-        ))}
+      <div className="flex justify-center items-center w-full">
+        <ImageSwiper 
+          images={getOfertaImages()} 
+          cardWidth={320} 
+          cardHeight={450} 
+          className="mb-8"
+        >
+          {(currentIndex) => (
+            <div className="w-full h-full">
+              <OfertaCard 
+                oferta={ofertas[currentIndex]} 
+                onPostular={handlePostular}
+                onEditar={handleEditar}
+                variant="grid"
+              />
+            </div>
+          )}
+        </ImageSwiper>
       </div>
     );
   };
 
   const renderOfertaList = () => {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <AnimatePresence>
           {ofertas.map((oferta, index) => (
-            <motion.div
+            <OfertaCard 
               key={oferta.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ 
-                duration: 0.3, 
-                delay: index * 0.1 
-              }}
-              className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/10 p-4 hover:bg-white/20 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-white">{oferta.titulo}</h3>
-                  <p className="text-sm text-gray-300 mt-1">
-                    {oferta.empresa || 'Sin empresa especificada'}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => handlePostular(oferta.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Postular
-                  </button>
-                  <button
-                    onClick={() => handleEditar(oferta.id)}
-                    className="text-white/50 hover:text-white transition-colors"
-                  >
-                    Editar
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              oferta={oferta} 
+              onPostular={handlePostular}
+              onEditar={handleEditar}
+              variant="list"
+            />
           ))}
         </AnimatePresence>
       </div>

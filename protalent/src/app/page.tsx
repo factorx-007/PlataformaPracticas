@@ -1,103 +1,190 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { World } from './components/ui/globe';
+import { 
+  BuildingOfficeIcon, 
+  UserGroupIcon, 
+  LightBulbIcon, 
+  ChartBarIcon, 
+  ClockIcon, 
+  ShieldCheckIcon 
+} from '@heroicons/react/24/outline';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // Datos de ejemplo para el globo
+  const globeData = [
+    {
+      order: 1,
+      startLat: -12.0464,
+      startLng: -77.0428,
+      endLat: 37.7749,
+      endLng: -122.4194,
+      arcAlt: 0.3,
+      color: '#3B82F6'
+    },
+    {
+      order: 2,
+      startLat: -12.0464,
+      startLng: -77.0428,
+      endLat: 40.7128,
+      endLng: -74.0060,
+      arcAlt: 0.4,
+      color: '#10B981'
+    }
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const globeConfig = {
+    pointSize: 4,
+    globeColor: "#1d072e",
+    showAtmosphere: true,
+    atmosphereColor: "#FFFFFF",
+    atmosphereAltitude: 0.1,
+    emissive: "#000000",
+    emissiveIntensity: 0.1,
+    shininess: 0.9,
+    polygonColor: "rgba(255,255,255,0.7)",
+    ambientLight: "#38BDF8",
+    directionalLeftLight: "#FFFFFF",
+    directionalTopLight: "#FFFFFF",
+    pointLight: "#FFFFFF",
+    autoRotate: true,
+    autoRotateSpeed: 0.5
+  };
+
+  return (
+    <div className="min-h-screen w-full bg-black flex flex-col items-center overflow-hidden">
+      {/* Hero Section with Globe */}
+      <div className="relative w-full h-screen flex flex-col items-center justify-center">
+        {/* Globe Background */}
+        <div className="absolute inset-0 z-10 opacity-50">
+          <World 
+            globeConfig={globeConfig} 
+            data={globeData} 
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Hero Content */}
+        <motion.div 
+          className="relative z-20 text-center py-20 px-4 max-w-4xl"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6">
+            Bienvenido a <span className="text-blue-400">ProTalent</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 mb-8">
+            La plataforma que conecta el talento de TECSUP con las mejores oportunidades de prácticas profesionales
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link 
+              href="/dashboard/ofertas" 
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-colors flex items-center gap-2"
+            >
+              <BuildingOfficeIcon className="h-5 w-5" />
+              Explorar Ofertas
+            </Link>
+            <Link 
+              href="/dashboard/empresas" 
+              className="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white hover:text-black rounded-full font-medium transition-colors flex items-center gap-2"
+            >
+              <UserGroupIcon className="h-5 w-5" />
+              Ver Empresas
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Features Section */}
+      <div className="w-full bg-white py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Tu Futuro Profesional Comienza Aquí</h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              ProTalent es la plataforma que conecta a los estudiantes y egresados de TECSUP con las mejores oportunidades de prácticas y empleo en empresas líderes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />,
+                title: 'Para Empresas',
+                description: 'Publica ofertas de prácticas, encuentra talento calificado y gestiona postulaciones en una sola plataforma.'
+              },
+              {
+                icon: <UserGroupIcon className="h-8 w-8 text-green-600" />,
+                title: 'Para Estudiantes',
+                description: 'Encuentra prácticas profesionales que se ajusten a tu perfil y da el primer paso en tu carrera profesional.'
+              },
+              {
+                icon: <LightBulbIcon className="h-8 w-8 text-purple-600" />,
+                title: 'IA Asistida',
+                description: 'Nuestro sistema de IA te ayuda a encontrar las mejores coincidencias entre ofertas y candidatos.'
+              },
+              {
+                icon: <ChartBarIcon className="h-8 w-8 text-yellow-600" />,
+                title: 'Métricas en Tiempo Real',
+                description: 'Accede a estadísticas y seguimiento de tus postulaciones o procesos de selección.'
+              },
+              {
+                icon: <ClockIcon className="h-8 w-8 text-red-600" />,
+                title: 'Ahorra Tiempo',
+                description: 'Automatizamos los procesos para que te centres en lo que realmente importa: encontrar el talento o la oportunidad perfecta.'
+              },
+              {
+                icon: <ShieldCheckIcon className="h-8 w-8 text-indigo-600" />,
+                title: 'Seguro y Confiable',
+                description: 'Tus datos están protegidos con los más altos estándares de seguridad y privacidad.'
+              }
+            ].map((feature, index) => (
+              <motion.div 
+                key={index} 
+                className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+              >
+                <div className="w-12 h-12 rounded-lg bg-opacity-10 flex items-center justify-center mb-4" style={{ backgroundColor: `${feature.icon.props.className.includes('blue') ? 'rgba(37, 99, 235, 0.1)' : feature.icon.props.className.includes('green') ? 'rgba(22, 163, 74, 0.1)' : feature.icon.props.className.includes('purple') ? 'rgba(147, 51, 234, 0.1)' : feature.icon.props.className.includes('yellow') ? 'rgba(234, 179, 8, 0.1)' : feature.icon.props.className.includes('red') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(79, 70, 229, 0.1)'}` }}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="w-full bg-gradient-to-r from-blue-600 to-blue-800 py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para impulsar tu carrera profesional?</h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Únete a miles de estudiantes que ya están dando el primer paso hacia su futuro profesional con ProTalent.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link 
+              href="/dashboard/postulaciones/nueva" 
+              className="px-8 py-3 bg-white text-blue-600 hover:bg-gray-100 rounded-full font-medium transition-colors flex items-center gap-2"
+            >
+              <BuildingOfficeIcon className="h-5 w-5" />
+              Crear Postulación
+            </Link>
+            <Link 
+              href="/dashboard/perfil/editar" 
+              className="px-8 py-3 border-2 border-white text-white hover:bg-white hover:bg-opacity-10 rounded-full font-medium transition-colors flex items-center gap-2"
+            >
+              <UserGroupIcon className="h-5 w-5" />
+              Completar Perfil
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
