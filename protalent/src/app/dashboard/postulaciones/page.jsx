@@ -83,7 +83,7 @@ export default function PostulacionesPage() {
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">        
+      <div className="relative z-10 max-w-7xl mx-auto ">        
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -129,14 +129,14 @@ export default function PostulacionesPage() {
               <p className="mt-1 text-gray-400">Comienza postulándote a una oferta que te interese.</p>
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="h-[calc(100vh-300px)] overflow-hidden">
+            <div className="h-[calc(100vh-250px)] overflow-y-hidden">
               <DraggableContainer variant="masonry">
                 <GridBody>
                   <AnimatePresence>
                     {postulaciones.map((postulacion, index) => (
                       <GridItem
                         key={postulacion.id}
-                        className="relative h-[450px] w-80"
+                        className="relative h-[400px] w-[300px]"
                       >
                         <motion.div
                           initial={{ opacity: 0, scale: 0.8 }}
