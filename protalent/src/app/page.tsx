@@ -1,9 +1,9 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { World } from './components/ui/globe';
 import { 
   BuildingOfficeIcon, 
   UserGroupIcon, 
@@ -12,6 +12,11 @@ import {
   ClockIcon, 
   ShieldCheckIcon 
 } from '@heroicons/react/24/outline';
+
+// Renderizado dinámico del componente World
+const World = dynamic(() => import('./components/ui/globe').then((mod) => mod.World), {
+  ssr: false
+});
 
 export default function Home() {
   // Datos de ejemplo para el globo
@@ -171,7 +176,7 @@ export default function Home() {
             <Link 
               href="/dashboard/postulaciones/nueva" 
               className="px-8 py-3 bg-white text-blue-600 hover:bg-gray-100 rounded-full font-medium transition-colors flex items-center gap-2"
-            >
+        >
               <BuildingOfficeIcon className="h-5 w-5" />
               Crear Postulación
             </Link>

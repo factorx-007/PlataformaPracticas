@@ -147,19 +147,19 @@ export default function OfertaCard({ oferta, onPostular, onEditar, variant = 'gr
         </div>
         
         <div className="flex space-x-4 mt-4">
-          <button
-            onClick={() => onPostular(oferta.id)}
+            <button
+              onClick={() => onPostular(oferta.id)}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-300 transform hover:translate-x-1"
-          >
+            >
             <span>Postular</span>
             <ArrowRightIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => onEditar(oferta.id)}
+            </button>
+            <button
+              onClick={() => onEditar(oferta.id)}
             className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg transition-colors"
-          >
-            Editar
-          </button>
+            >
+              Editar
+            </button>
         </div>
       </div>
     </motion.div>
