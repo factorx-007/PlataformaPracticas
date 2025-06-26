@@ -3,13 +3,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SparklesCore } from '../../components/ui/sparkles';
-import { ImageSwiper } from '../../components/ui/image-swiper';
+import InfiniteMenu from '../../components/ui/infinite-menu';
+import api from '../../lib/api';
 import { 
   LayoutGridIcon, 
   ListIcon 
 } from 'lucide-react';
-import OfertaCard from './OfertaCard';
-import api from '../../lib/api';
 
 export default function OfertasPage() {
   const [ofertas, setOfertas] = useState([]);
@@ -24,109 +23,25 @@ export default function OfertasPage() {
   const fetchOfertas = async () => {
     try {
       const { data } = await api.get('/api/ofertas');
-      // Enriquecer los datos de la oferta si es necesario
-      const enrichedOfertas = data.map(oferta => ({
-        ...oferta,
-        imagen: oferta.imagen || null,
-        empresa: oferta.empresa || 'Empresa no especificada',
-        ubicacion: oferta.ubicacion || 'Ubicación no especificada',
-        fechaInicio: oferta.fechaInicio || null,
-        salario: oferta.salario ? `$${oferta.salario}` : 'Salario no especificado'
+      // Transformar ofertas para el InfiniteMenu
+      const menuItems = data.map(oferta => ({
+        image: oferta.imagen || `https://via.placeholder.com/900x900.png?text=${encodeURIComponent(oferta.titulo)}`,
+        link: `/dashboard/postulaciones/crear/${oferta.id}`,
+        title: oferta.titulo,
+        description: `${oferta.empresa || 'Empresa'} • ${oferta.ubicacion || 'Ubicación'}`,
+        ofertaData: oferta // Guardar datos completos para referencia
       }));
-      setOfertas(enrichedOfertas);
+      
+      setOfertas(menuItems);
+      setLoading(false);
     } catch (error) {
       console.error('Error cargando ofertas:', error);
-      // Manejar el error de manera amigable
-      alert('No se pudieron cargar las ofertas. Por favor, intenta de nuevo.');
-    } finally {
       setLoading(false);
     }
   };
 
-  const handlePostular = async (ofertaId) => {
-    try {
-      // Navegar al formulario de postulación
-      router.push(`/dashboard/postulaciones/crear/${ofertaId}`);
-    } catch (error) {
-      console.error('Error al postular:', error);
-      alert('No se pudo procesar la postulación. Por favor, intenta de nuevo.');
-    }
-  };
-
-  const handleEditar = (ofertaId) => {
-    // Navegar al formulario de edición de oferta
-    router.push(`/dashboard/ofertas/editar/${ofertaId}`);
-  };
-
-  const getOfertaImages = () => {
-    return ofertas.map(oferta => 
-      oferta.imagen || `https://via.placeholder.com/300x400.png?text=${encodeURIComponent(oferta.titulo)}`
-    ).join(',');
-  };
-
-  const renderOfertaSwiper = () => {
-    return (
-      <div className="flex justify-center items-center w-full">
-        <ImageSwiper 
-          images={getOfertaImages()} 
-          cardWidth={400} 
-          cardHeight={500} 
-          className="mb-8"
-        >
-          {(currentIndex) => (
-            <div className="w-full h-full">
-              <OfertaCard 
-                oferta={ofertas[currentIndex]} 
-                onPostular={handlePostular}
-                onEditar={handleEditar}
-              />
-            </div>
-          )}
-        </ImageSwiper>
-      </div>
-    );
-  };
-
-  const renderOfertaGrid = () => {
-    return (
-      <div className="flex justify-center items-center w-full">
-        <ImageSwiper 
-          images={getOfertaImages()} 
-          cardWidth={320} 
-          cardHeight={450} 
-          className="mb-8"
-        >
-          {(currentIndex) => (
-            <div className="w-full h-full">
-              <OfertaCard 
-                oferta={ofertas[currentIndex]} 
-                onPostular={handlePostular}
-                onEditar={handleEditar}
-                variant="grid"
-              />
-            </div>
-          )}
-        </ImageSwiper>
-      </div>
-    );
-  };
-
-  const renderOfertaList = () => {
-    return (
-      <div className="space-y-6">
-        <AnimatePresence>
-          {ofertas.map((oferta, index) => (
-            <OfertaCard 
-              key={oferta.id}
-              oferta={oferta} 
-              onPostular={handlePostular}
-              onEditar={handleEditar}
-              variant="list"
-            />
-          ))}
-        </AnimatePresence>
-      </div>
-    );
+  const handleCardClick = (ofertaId) => {
+    router.push(`/dashboard/postulaciones/crear/${ofertaId}`);
   };
 
   if (loading) {
@@ -161,7 +76,7 @@ export default function OfertasPage() {
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto">        
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -171,14 +86,6 @@ export default function OfertasPage() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-white">Ofertas de Prácticas</h1>
             <div className="flex items-center space-x-4">
-              <div className="flex space-x-2 bg-white/10 rounded-full p-1 mr-4">
-                <button 
-                  onClick={() => router.push('/dashboard/ofertas/crear')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  + Nueva Oferta
-                </button>
-              </div>
               <div className="flex space-x-2 bg-white/10 rounded-full p-1">
                 <button 
                   onClick={() => setViewMode('grid')}
@@ -201,6 +108,12 @@ export default function OfertasPage() {
                   <ListIcon className="h-5 w-5" />
                 </button>
               </div>
+              <button 
+                onClick={() => router.push('/dashboard/ofertas/crear')}
+                className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#062056] px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                + Nueva Oferta
+              </button>
             </div>
           </div>
 
@@ -215,11 +128,50 @@ export default function OfertasPage() {
               <p className="mt-1 text-gray-400">Crea tu primera oferta de prácticas.</p>
             </div>
           ) : viewMode === 'grid' ? (
-            renderOfertaSwiper()
-          ) : viewMode === 'masonry' ? (
-            renderOfertaGrid()
+            <div className="h-[600px] w-full">
+              <InfiniteMenu 
+                items={ofertas} 
+                onListView={() => setViewMode('list')} 
+              />
+            </div>
           ) : (
-            renderOfertaList()
+            <div className="space-y-4">
+              <AnimatePresence>
+                {ofertas.map((oferta, index) => (
+                  <motion.div
+                    key={oferta.link}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: index * 0.1 
+                    }}
+                    onClick={() => handleCardClick(oferta.link.split('/').pop())}
+                    className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/10 p-4 hover:bg-white/20 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-medium text-white">
+                          {oferta.title}
+                        </h3>
+                        <p className="text-sm text-gray-300 mt-1">
+                          {oferta.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span className="text-sm bg-white/10 px-3 py-1 rounded-full text-white/70">
+                          {oferta.ofertaData?.modalidad || 'Modalidad no especificada'}
+                        </span>
+                        <span className="text-sm text-gray-300">
+                          {oferta.ofertaData?.duracion || 'Duración no especificada'}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
           )}
         </motion.div>
       </div>

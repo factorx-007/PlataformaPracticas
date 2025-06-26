@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { SparklesCore } from "../components/ui/sparkles"
 import { BuildingOfficeIcon, UserGroupIcon, LightBulbIcon, ChartBarIcon, ClockIcon, ShieldCheckIcon, ArrowsPointingOutIcon, DevicePhoneMobileIcon, ChatBubbleLeftRightIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen w-full bg-black flex flex-col items-center overflow-hidden">
-      {/* Hero Section with Sparkles */}
-      <div className="w-full relative pt-24">
+    <div className="relative min-h-screen bg-black flex flex-col items-center overflow-hidden pt-24 px-4 sm:px-6 lg:px-8">
+      {/* Fondo de partículas */}
         <div className="absolute inset-0 w-full h-full">
           <SparklesCore
             id="tsparticlesfullpage"
@@ -21,231 +21,226 @@ export default function DashboardPage() {
           />
         </div>
         
-        <div className="relative z-20 text-center py-20 px-4">
-          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6">
-            Bienvenido a <span className="text-blue-400">ProTalent</span>
+      <div className="relative z-10 max-w-7xl w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/10 p-8"
+        >
+          {/* Sección de Bienvenida */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Bienvenido a <span className="text-[#38bdf8]">ProTalent</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
-            La plataforma que conecta el talento de TECSUP con las mejores oportunidades de prácticas profesionales
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 mt-10">
-            <Link 
-              href="/dashboard/ofertas" 
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-colors flex items-center gap-2"
-            >
-              <BuildingOfficeIcon className="h-5 w-5" />
-              Explorar Ofertas
-            </Link>
-            <Link 
-              href="/dashboard/empresas" 
-              className="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white hover:text-black rounded-full font-medium transition-colors flex items-center gap-2"
-            >
-              <UserGroupIcon className="h-5 w-5" />
-              Ver Empresas
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="w-full bg-white py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Tu Futuro Profesional Comienza Aquí</h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              ProTalent es la plataforma que conecta a los estudiantes y egresados de TECSUP con las mejores oportunidades de prácticas y empleo en empresas líderes.
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+              Conectamos talento estudiantil con oportunidades profesionales de vanguardia
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Sección de Acceso Rápido */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {[
               {
-                icon: <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />,
-                title: 'Para Empresas',
-                description: 'Publica ofertas de prácticas, encuentra talento calificado y gestiona postulaciones en una sola plataforma.'
+                icon: <BuildingOfficeIcon className="h-8 w-8 text-[#38bdf8]" />,
+                title: 'Ofertas',
+                description: 'Explora oportunidades de prácticas personalizadas',
+                link: '/dashboard/ofertas',
+                stats: '50+ Nuevas Ofertas'
               },
               {
-                icon: <UserGroupIcon className="h-8 w-8 text-green-600" />,
-                title: 'Para Estudiantes',
-                description: 'Encuentra prácticas profesionales que se ajusten a tu perfil y da el primer paso en tu carrera profesional.'
+                icon: <UserGroupIcon className="h-8 w-8 text-[#0ea5e9]" />,
+                title: 'Postulaciones',
+                description: 'Gestiona tus solicitudes en un solo lugar',
+                link: '/dashboard/postulaciones',
+                stats: '25 Postulaciones Activas'
               },
               {
-                icon: <LightBulbIcon className="h-8 w-8 text-purple-600" />,
-                title: 'IA Asistida',
-                description: 'Nuestro sistema de IA te ayuda a encontrar las mejores coincidencias entre ofertas y candidatos.'
-              },
-              {
-                icon: <ChartBarIcon className="h-8 w-8 text-yellow-600" />,
-                title: 'Métricas en Tiempo Real',
-                description: 'Accede a estadísticas y seguimiento de tus postulaciones o procesos de selección.'
-              },
-              {
-                icon: <ClockIcon className="h-8 w-8 text-red-600" />,
-                title: 'Ahorra Tiempo',
-                description: 'Automatizamos los procesos para que te centres en lo que realmente importa: encontrar el talento o la oportunidad perfecta.'
-              },
-              {
-                icon: <ShieldCheckIcon className="h-8 w-8 text-indigo-600" />,
-                title: 'Seguro y Confiable',
-                description: 'Tus datos están protegidos con los más altos estándares de seguridad y privacidad.'
+                icon: <LightBulbIcon className="h-8 w-8 text-[#06b6d4]" />,
+                title: 'Empresas',
+                description: 'Conoce a nuestros socios estratégicos',
+                link: '/dashboard/empresas',
+                stats: '20 Empresas Asociadas'
               }
-            ].map((feature, index) => (
-              <div key={index} className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-lg bg-opacity-10 flex items-center justify-center mb-4" style={{ backgroundColor: `${feature.icon.props.className.includes('blue') ? 'rgba(37, 99, 235, 0.1)' : feature.icon.props.className.includes('green') ? 'rgba(22, 163, 74, 0.1)' : feature.icon.props.className.includes('purple') ? 'rgba(147, 51, 234, 0.1)' : feature.icon.props.className.includes('yellow') ? 'rgba(234, 179, 8, 0.1)' : feature.icon.props.className.includes('red') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(79, 70, 229, 0.1)'}` }}>
-                  {feature.icon}
+            ].map((item, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  delay: index * 0.2, 
+                  duration: 0.5 
+                }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/10 border border-white/10 rounded-xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300 cursor-pointer group"
+                onClick={() => window.location.href = item.link}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-16 h-16 rounded-lg flex items-center justify-center bg-opacity-10" style={{ backgroundColor: `${item.icon.props.className.split(' ')[2]}10` }}>
+                    {item.icon}
+                  </div>
+                  <span className="text-sm text-[#38bdf8] bg-[#38bdf8]/10 px-3 py-1 rounded-full">
+                    {item.stats}
+                  </span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
+                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-300 mb-4">{item.description}</p>
+                <div className="flex items-center text-[#38bdf8] group-hover:translate-x-2 transition-transform">
+                  <span className="mr-2">Explorar</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* How It Works Section */}
-      <div className="w-full bg-gray-50 py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">¿Cómo funciona ProTalent?</h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Sencillos pasos para conectar el talento con las mejores oportunidades
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
+          {/* Sección de Estadísticas */}
+          <div className="grid md:grid-cols-4 gap-6 mb-12 bg-white/5 rounded-xl p-6 border border-white/10">
             {[
-              { number: '1', title: 'Regístrate', description: 'Crea tu perfil en minutos' },
-              { number: '2', title: 'Completa tu perfil', description: 'Añade tus habilidades y experiencia' },
-              { number: '3', title: 'Explora ofertas', description: 'Encuentra prácticas que se ajusten a tu perfil' },
-              { number: '4', title: 'Postúlate', description: 'Envía tu solicitud en un clic' }
-            ].map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white text-2xl font-bold rounded-full flex items-center justify-center mx-auto mb-4">
-                  {step.number}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
-              </div>
+              { 
+                title: 'Ofertas Activas', 
+                value: '50+', 
+                icon: '💼',
+                color: 'text-[#38bdf8]'
+              },
+              { 
+                title: 'Empresas', 
+                value: '20+', 
+                icon: '🏢',
+                color: 'text-[#0ea5e9]'
+              },
+              { 
+                title: 'Postulantes', 
+                value: '500+', 
+                icon: '👥',
+                color: 'text-[#06b6d4]'
+              },
+              { 
+                title: 'Éxito', 
+                value: '85%', 
+                icon: '🎯',
+                color: 'text-[#38bdf8]'
+              }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  delay: index * 0.2, 
+                  duration: 0.5 
+                }}
+                className="text-center bg-white/10 rounded-xl p-4 border border-white/10 hover:border-[#38bdf8]/30 transition-all"
+              >
+                <div className={`text-4xl font-bold mb-2 ${stat.color}`}>{stat.value}</div>
+                <div className="text-xl mb-2">{stat.icon}</div>
+                <p className="text-gray-300 text-sm">{stat.title}</p>
+              </motion.div>
             ))}
-          </div>
+      </div>
+
+          {/* Sección de Próximas Acciones */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">Próximas Acciones</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                {
+                  title: 'Completar Perfil',
+                  description: 'Añade más detalles para aumentar tus posibilidades',
+                  icon: '👤',
+                  action: 'Editar Perfil',
+                  link: '/dashboard/perfil/editar'
+                },
+                {
+                  title: 'Nuevas Ofertas',
+                  description: 'Descubre oportunidades que se ajustan a tu perfil',
+                  icon: '🚀',
+                  action: 'Explorar Ofertas',
+                  link: '/dashboard/ofertas'
+                }
+              ].map((action, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: index * 0.2, 
+                    duration: 0.5 
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-white/10 border border-white/10 rounded-xl p-6 flex items-center justify-between hover:border-[#38bdf8]/30 transition-all cursor-pointer group"
+                  onClick={() => window.location.href = action.link}
+                >
+                  <div>
+                    <div className="text-3xl mb-2">{action.icon}</div>
+                    <h3 className="text-xl font-bold text-white mb-2">{action.title}</h3>
+                    <p className="text-gray-300 mb-4">{action.description}</p>
+                </div>
+                  <div className="text-[#38bdf8] group-hover:translate-x-2 transition-transform flex items-center">
+                    <span className="mr-2">{action.action}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+              </div>
+                </motion.div>
+              ))}
         </div>
       </div>
 
-      {/* Benefits Section */}
-      <div className="w-full bg-white py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Beneficios de usar ProTalent</h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              La plataforma que revoluciona la búsqueda de prácticas profesionales
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Benefit 1 */}
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <ArrowsPointingOutIcon className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Mayor Alcance</h3>
-                <p className="text-gray-600">Conecta con cientos de empresas y oportunidades que no encontrarías de otra manera.</p>
-              </div>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DevicePhoneMobileIcon className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Acceso Móvil</h3>
-                <p className="text-gray-600">Gestiona tus postulaciones desde cualquier dispositivo, en cualquier momento.</p>
-              </div>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <ChatBubbleLeftRightIcon className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Comunicación Directa</h3>
-                <p className="text-gray-600">Chatea directamente con los reclutadores y resuelve tus dudas en tiempo real.</p>
-              </div>
-            </div>
-
-            {/* Benefit 4 */}
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <Cog6ToothIcon className="h-6 w-6 text-yellow-600" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Personalización</h3>
-                <p className="text-gray-600">Recibe recomendaciones personalizadas basadas en tu perfil e intereses.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="w-full bg-gradient-to-r from-blue-600 to-blue-800 py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para impulsar tu carrera profesional?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Únete a miles de estudiantes que ya están dando el primer paso hacia su futuro profesional con ProTalent.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link 
-              href="/dashboard/postulaciones/nueva" 
-              className="px-8 py-3 bg-white text-blue-600 hover:bg-gray-100 rounded-full font-medium transition-colors flex items-center gap-2"
+          {/* Botón de Blog Mejorado */}
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="inline-block relative group"
             >
-              <BuildingOfficeIcon className="h-5 w-5" />
-              Crear Postulación
-            </Link>
             <Link 
-              href="/dashboard/perfil/editar" 
-              className="px-8 py-3 border-2 border-white text-white hover:bg-white hover:bg-opacity-10 rounded-full font-medium transition-colors flex items-center gap-2"
-            >
-              <UserGroupIcon className="h-5 w-5" />
-              Completar Perfil
-            </Link>
+                href="/blog" 
+                className="relative z-10 inline-flex items-center px-10 py-4 bg-gradient-to-r from-[#38bdf8] to-[#0ea5e9] text-[#062056] rounded-full font-semibold shadow-2xl hover:shadow-xl transition-all duration-300 transform hover:scale-105 group"
+              >
+                <motion.span
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 20 
+                  }}
+                  className="flex items-center relative z-20"
+                >
+                  <span className="mr-3 text-2xl">📝</span>
+                  Descubre Nuestro Blog
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </motion.span>
+                
+                {/* Efecto de brillo */}
+                <motion.div
+                  className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-full transition-opacity duration-300 z-0"
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+                
+                {/* Efecto de partículas */}
+                <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                  <SparklesCore
+                    id="blog-button-sparkles"
+                    background="transparent"
+                    minSize={0.2}
+                    maxSize={0.8}
+                    particleDensity={30}
+                    className="w-full h-full opacity-30"
+                    particleColor="#FFFFFF"
+                  />
+            </div>
+              </Link>
+            </motion.div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="w-full bg-white py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">500+</div>
-              <p className="text-gray-600">Estudiantes activos</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-green-600 mb-2">200+</div>
-              <p className="text-gray-600">Empresas asociadas</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-purple-600 mb-2">1,000+</div>
-              <p className="text-gray-600">Oportunidades</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-yellow-600 mb-2">95%</div>
-              <p className="text-gray-600">Tasa de satisfacción</p>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

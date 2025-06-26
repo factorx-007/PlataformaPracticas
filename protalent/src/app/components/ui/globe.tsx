@@ -62,6 +62,15 @@ export type GlobeConfig = {
   };
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  arcStroke?: number;
+  arcDashLength?: number;
+  arcDashGap?: number;
+  ringsColor?: string;
+  ringMaxRadius?: number;
+  ringPropagationSpeed?: number;
+  ringRepeatPeriod?: number;
+  pointAltitude?: number;
+  pointRadius?: number;
 };
  
 interface WorldProps {
@@ -75,34 +84,6 @@ export function Globe({ globeConfig, data }: WorldProps) {
   const globeRef = useRef<ThreeGlobe | null>(null);
   const groupRef = useRef();
   const [isInitialized, setIsInitialized] = useState(false);
- 
-  const japaneseGlobeConfig = {
-    ...globeConfig,
-    globeColor: JAPANESE_PALETTE.DEEP_NAVY,
-    atmosphereColor: JAPANESE_PALETTE.SAKURA_PINK,
-    atmosphereAltitude: 0.25,
-    
-    // Mejoras de arcos y puntos
-    arcsColor: () => JAPANESE_PALETTE.SAKURA_PINK,
-    arcStroke: 0.8,
-    arcDashLength: 0.4,
-    arcDashGap: 0.2,
-    arcDashAnimateTime: 2000,
-    
-    pointsColor: () => JAPANESE_PALETTE.GOLD_ACCENT,
-    pointAltitude: 0.02,
-    pointRadius: 0.8,
-    
-    // Efectos adicionales
-    ringsColor: () => `rgba(255, 107, 107, 0.8)`,
-    ringMaxRadius: 4,
-    ringPropagationSpeed: 1.5,
-    ringRepeatPeriod: 1000,
-    
-    enablePointerInteraction: true,
-    showAtmosphere: true,
-    showGraticules: false
-  };
  
   // Initialize globe only once
   useEffect(() => {
@@ -123,8 +104,8 @@ export function Globe({ globeConfig, data }: WorldProps) {
       emissiveIntensity: number;
       shininess: number;
     };
-    globeMaterial.color = new Color(globeConfig.globeColor);
-    globeMaterial.emissive = new Color(globeConfig.emissive);
+    globeMaterial.color = new Color(globeConfig.globeColor || "#062056");
+    globeMaterial.emissive = new Color(globeConfig.emissive || "#062056");
     globeMaterial.emissiveIntensity = globeConfig.emissiveIntensity || 0.1;
     globeMaterial.shininess = globeConfig.shininess || 0.9;
   }, [
@@ -143,16 +124,16 @@ export function Globe({ globeConfig, data }: WorldProps) {
     let points = [];
     for (let i = 0; i < arcs.length; i++) {
       const arc = arcs[i];
-      const rgb = hexToRgb(arc.color) as { r: number; g: number; b: number };
+      // const rgb = hexToRgb(arc.color) as { r: number; g: number; b: number }; // No longer needed
       points.push({
-        size: japaneseGlobeConfig.pointSize,
+        size: globeConfig.pointSize || 4,
         order: arc.order,
         color: arc.color,
         lat: arc.startLat,
         lng: arc.startLng,
       });
       points.push({
-        size: japaneseGlobeConfig.pointSize,
+        size: globeConfig.pointSize || 4,
         order: arc.order,
         color: arc.color,
         lat: arc.endLat,
@@ -163,10 +144,11 @@ export function Globe({ globeConfig, data }: WorldProps) {
     // remove duplicates for same lat and lng
     const filteredPoints = points.filter(
       (v, i, a) =>
-        a.findIndex((v2) =>
-          ["lat", "lng"].every(
-            (k) => v2[k as "lat" | "lng"] === v[k as "lat" | "lng"],
-          ),
+        a.findIndex(
+          (v2) =>
+            ["lat", "lng"].every(
+              (k) => v2[k as "lat" | "lng"] === v[k as "lat" | "lng"],
+            ),
         ) === i,
     );
  
@@ -174,10 +156,10 @@ export function Globe({ globeConfig, data }: WorldProps) {
       .hexPolygonsData(countries.features)
       .hexPolygonResolution(3)
       .hexPolygonMargin(0.7)
-      .showAtmosphere(japaneseGlobeConfig.showAtmosphere)
-      .atmosphereColor(japaneseGlobeConfig.atmosphereColor)
-      .atmosphereAltitude(japaneseGlobeConfig.atmosphereAltitude)
-      .hexPolygonColor(() => japaneseGlobeConfig.polygonColor);
+      .showAtmosphere(globeConfig.showAtmosphere ?? true)
+      .atmosphereColor(globeConfig.atmosphereColor || "#FFFFFF")
+      .atmosphereAltitude(globeConfig.atmosphereAltitude || 0.1)
+      .hexPolygonColor(() => globeConfig.polygonColor || "rgba(255,255,255,0.7)");
  
     globeRef.current
       .arcsData(data)
@@ -187,39 +169,43 @@ export function Globe({ globeConfig, data }: WorldProps) {
       .arcEndLng((d) => (d as { endLng: number }).endLng * 1)
       .arcColor((e: any) => (e as { color: string }).color)
       .arcAltitude((e) => (e as { arcAlt: number }).arcAlt * 1)
-      .arcStroke(() => japaneseGlobeConfig.arcStroke)
-      .arcDashLength(japaneseGlobeConfig.arcDashLength)
+      .arcStroke(globeConfig.arcStroke || 0.5)
+      .arcDashLength(globeConfig.arcDashLength || 0.5)
       .arcDashInitialGap((e) => (e as { order: number }).order * 1)
-      .arcDashGap(japaneseGlobeConfig.arcDashGap)
-      .arcDashAnimateTime(() => japaneseGlobeConfig.arcDashAnimateTime);
+      .arcDashGap(globeConfig.arcDashGap || 0.1)
+      .arcDashAnimateTime(globeConfig.arcTime || 1000);
  
     globeRef.current
       .pointsData(filteredPoints)
       .pointColor((e) => (e as { color: string }).color)
       .pointsMerge(true)
-      .pointAltitude(japaneseGlobeConfig.pointAltitude)
-      .pointRadius(japaneseGlobeConfig.pointRadius);
+      .pointAltitude(globeConfig.pointAltitude || 0.01)
+      .pointRadius(globeConfig.pointRadius || 0.2);
  
     globeRef.current
       .ringsData([])
-      .ringColor(() => japaneseGlobeConfig.ringsColor)
-      .ringMaxRadius(japaneseGlobeConfig.ringMaxRadius)
-      .ringPropagationSpeed(japaneseGlobeConfig.ringPropagationSpeed)
-      .ringRepeatPeriod(japaneseGlobeConfig.ringRepeatPeriod);
+      .ringColor(globeConfig.ringsColor || "rgba(255,255,255,0.7)")
+      .ringMaxRadius(globeConfig.ringMaxRadius || 1)
+      .ringPropagationSpeed(globeConfig.ringPropagationSpeed || 3)
+      .ringRepeatPeriod(globeConfig.ringRepeatPeriod || 1000);
   }, [
     isInitialized,
     data,
-    japaneseGlobeConfig.pointSize,
-    japaneseGlobeConfig.showAtmosphere,
-    japaneseGlobeConfig.atmosphereColor,
-    japaneseGlobeConfig.atmosphereAltitude,
-    japaneseGlobeConfig.polygonColor,
-    japaneseGlobeConfig.arcDashLength,
-    japaneseGlobeConfig.arcDashAnimateTime,
-    japaneseGlobeConfig.rings,
-    japaneseGlobeConfig.maxRings,
-    japaneseGlobeConfig.arcStroke,
-    japaneseGlobeConfig.arcDashGap,
+    globeConfig.pointSize,
+    globeConfig.showAtmosphere,
+    globeConfig.atmosphereColor,
+    globeConfig.atmosphereAltitude,
+    globeConfig.polygonColor,
+    globeConfig.arcDashLength,
+    globeConfig.arcTime,
+    globeConfig.arcStroke,
+    globeConfig.arcDashGap,
+    globeConfig.pointAltitude,
+    globeConfig.pointRadius,
+    globeConfig.ringsColor,
+    globeConfig.ringMaxRadius,
+    globeConfig.ringPropagationSpeed,
+    globeConfig.ringRepeatPeriod,
   ]);
  
   // Handle rings animation with cleanup
@@ -232,7 +218,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
       const newNumbersOfRings = genRandomNumbers(
         0,
         data.length,
-        Math.floor((data.length * 4) / 5),
+        Math.floor((data.length * (globeConfig.rings || 1)) / 5),
       );
  
       const ringsData = data
@@ -244,12 +230,12 @@ export function Globe({ globeConfig, data }: WorldProps) {
         }));
  
       globeRef.current.ringsData(ringsData);
-    }, 2000);
+    }, globeConfig.ringRepeatPeriod || 2000);
  
     return () => {
       clearInterval(interval);
     };
-  }, [isInitialized, data]);
+  }, [isInitialized, data, globeConfig.rings, globeConfig.ringRepeatPeriod]);
  
   return <group ref={groupRef} />;
 }

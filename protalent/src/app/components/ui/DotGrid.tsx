@@ -29,8 +29,8 @@ function hexToRgb(hex) {
 const DotGrid = ({
   dotSize = 16,
   gap = 32,
-  baseColor = "#f3f4f6",
-  activeColor = "#6366f1",
+  baseColor = "#062056",
+  activeColor = "#38bdf8",
   proximity = 150,
   speedTrigger = 100,
   shockRadius = 250,
@@ -228,7 +228,10 @@ const DotGrid = ({
     <div
       ref={wrapperRef}
       className={`fixed inset-0 w-full h-full overflow-hidden z-0 ${className}`}
-      style={style}
+      style={{
+        ...style,
+        background: 'linear-gradient(135deg, rgba(6, 32, 86, 0.05) 0%, rgba(56, 189, 248, 0.05) 100%)',
+      }}
     >
       <canvas
         ref={canvasRef}

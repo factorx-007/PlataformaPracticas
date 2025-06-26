@@ -15,7 +15,6 @@ const navItems = [
   { name: 'Postulaciones', path: '/dashboard/postulaciones', icon: '📝' },
   { name: 'Ofertas', path: '/dashboard/ofertas', icon: '💼' },
   { name: 'Empresas', path: '/dashboard/empresas', icon: '🏢' },
-  { name: 'Blog', path: '/dashboard/blog', icon: '📰' },
 ];
 
 export default function ModernNavbar() {
@@ -47,8 +46,8 @@ export default function ModernNavbar() {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' 
-          : 'bg-white/80 backdrop-blur-sm py-3'
+          ? 'bg-[#062056]/95 backdrop-blur-md shadow-lg py-2' 
+          : 'bg-[#062056]/80 backdrop-blur-sm py-3'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,15 +76,15 @@ export default function ModernNavbar() {
                 href={item.path}
                 className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center ${
                   pathname === item.path
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ? 'bg-[#38bdf8]/20 text-[#38bdf8]'
+                    : 'text-white hover:bg-[#38bdf8]/10 hover:text-[#38bdf8]'
                 }`}
               >
                 <span className="mr-2 text-base">{item.icon}</span>
                 {item.name}
                 {pathname === item.path && (
                   <motion.span 
-                    className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-[#38bdf8]"
                     layoutId="activeNavItem"
                     transition={{
                       type: 'spring',
@@ -96,6 +95,31 @@ export default function ModernNavbar() {
                 )}
               </Link>
             ))}
+
+            {/* Blog Button con animación */}
+            <Link 
+              href="/blog"
+              className="ml-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#38bdf8] to-[#0ea5e9] text-white text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:rotate-3 group relative overflow-hidden"
+            >
+              <motion.span 
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20 
+                }}
+                className="flex items-center"
+              >
+                📰 Blog
+                <motion.div
+                  className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.span>
+            </Link>
           </nav>
 
           {/* User Menu */}

@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import { FiEdit2 } from 'react-icons/fi';
-import SidebarMenu, { defaultMenuItems } from './SidebarMenu';
-import SidebarGroups, { defaultGroups } from './SidebarGroups';
-import SidebarShortcuts, { defaultShortcuts } from './SidebarShortcuts';
+import SidebarMenu, { defaultMenuItems } from '../SidebarMenu';
+import SidebarGroups, { defaultGroups } from '../SidebarGroups';
+import SidebarShortcuts, { defaultShortcuts } from '../SidebarShortcuts';
 
 export default function Sidebar() {
   const handleProfileEdit = () => {
