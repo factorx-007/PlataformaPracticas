@@ -2,8 +2,11 @@
 const bcrypt = require('bcryptjs');
 const { Usuario, Estudiante, Empresa } = require('../models');
 const { Op } = require('sequelize');
+const { OAuth2Client } = require('google-auth-library');
 const generateToken = require('../utils/generateToken');
-const { Op } = require('sequelize');
+
+// Inicializar cliente de Google OAuth
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Registro
 const register = async (req, res) => {
@@ -140,7 +143,34 @@ const logout = (req, res) => {
 // Login/Registro con Google
 const googleAuth = async (req, res) => {
   try {
-    const { googleId, email, nombre, rol } = req.body;
+    const { credential, rol } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: 'Token de Google requerido' });
+    }
+
+    if (!rol || !['estudiante', 'egresado', 'empresa'].includes(rol)) {
+      return res.status(400).json({ error: 'Rol válido requerido: estudiante, egresado, empresa' });
+    }
+
+    // ✅ VERIFICAR TOKEN CON GOOGLE (SEGURIDAD)
+    let ticket;
+    try {
+      ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+    } catch (error) {
+      return res.status(401).json({ error: 'Token de Google inválido' });
+    }
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name: nombre, picture } = payload;
+
+    // Verificar que el email esté verificado por Google
+    if (!payload.email_verified) {
+      return res.status(400).json({ error: 'Email no verificado por Google' });
+    }
 
     // Buscar usuario existente por googleId o email
     let user = await Usuario.findOne({ 
@@ -153,9 +183,15 @@ const googleAuth = async (req, res) => {
     });
 
     if (user) {
-      // Usuario existente - actualizar googleId si es necesario
+      // Usuario existente
       if (!user.googleId) {
+        // Vincular cuenta existente con Google
         await user.update({ googleId });
+      }
+      
+      // Actualizar información si es necesario
+      if (user.nombre !== nombre) {
+        await user.update({ nombre });
       }
     } else {
       // Nuevo usuario - crear con Google
@@ -169,12 +205,18 @@ const googleAuth = async (req, res) => {
       });
     }
 
-    // Verificar si tiene perfil completo
+    // Verificar si tiene perfil específico completo
     let perfilEspecifico = null;
     if (user.rol === 'empresa') {
       perfilEspecifico = await Empresa.findOne({ where: { usuarioId: user.id } });
     } else if (user.rol === 'estudiante' || user.rol === 'egresado') {
       perfilEspecifico = await Estudiante.findOne({ where: { usuarioId: user.id } });
+    }
+
+    // Actualizar perfilCompleto si es necesario
+    const tienePerfilCompleto = !!perfilEspecifico;
+    if (user.perfilCompleto !== tienePerfilCompleto) {
+      await user.update({ perfilCompleto: tienePerfilCompleto });
     }
 
     const token = generateToken({ id: user.id, rol: user.rol });
@@ -187,11 +229,16 @@ const googleAuth = async (req, res) => {
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
-        perfilCompleto: !!perfilEspecifico
+        perfilCompleto: tienePerfilCompleto,
+        picture // URL de la foto de Google
       },
-      necesitaCompletarPerfil: !perfilEspecifico
+      necesitaCompletarPerfil: !tienePerfilCompleto,
+      redirectTo: !tienePerfilCompleto ? 
+        (user.rol === 'empresa' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
+        '/dashboard'
     });
   } catch (error) {
+    console.error('Error en Google Auth:', error);
     res.status(500).json({ error: 'Error en autenticación con Google', detalle: error.message });
   }
 };
@@ -242,6 +289,54 @@ const completarPerfilEmpresa = async (req, res) => {
   }
 };
 
+// Verificar estado del perfil del usuario
+const verificarEstadoPerfil = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const user = await Usuario.findByPk(userId, {
+      attributes: ['id', 'nombre', 'email', 'rol', 'perfilCompleto'],
+      include: [
+        {
+          model: Estudiante,
+          required: false,
+          attributes: ['id', 'carrera', 'año_egreso', 'telefono', 'tipo', 'cv', 'foto_perfil']
+        },
+        {
+          model: Empresa,
+          required: false,
+          attributes: ['id', 'ruc', 'nombre_empresa', 'rubro', 'descripcion', 'direccion', 'telefono']
+        }
+      ]
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const tienePerfilEspecifico = !!(user.Estudiante || user.Empresa);
+    
+    // Actualizar perfilCompleto si es necesario
+    if (user.perfilCompleto !== tienePerfilEspecifico) {
+      await user.update({ perfilCompleto: tienePerfilEspecifico });
+      user.perfilCompleto = tienePerfilEspecifico;
+    }
+
+    res.json({
+      mensaje: 'Estado del perfil del usuario',
+      user,
+      perfilCompleto: tienePerfilEspecifico,
+      necesitaCompletarPerfil: !tienePerfilEspecifico,
+      redirectTo: !tienePerfilEspecifico ? 
+        (user.rol === 'empresa' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
+        null
+    });
+  } catch (error) {
+    console.error('Error al verificar estado del perfil:', error);
+    res.status(500).json({ error: 'Error al verificar estado del perfil', detalle: error.message });
+  }
+};
+
 module.exports = { 
     register, 
     login,
@@ -249,4 +344,5 @@ module.exports = {
     logout, 
     googleAuth,
     completarPerfilEmpresa,
+    verificarEstadoPerfil,
 };
