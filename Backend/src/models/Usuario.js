@@ -15,4 +15,4 @@ module.exports = (sequelize) => {
       allowNull: true,              // ✅ Opcional
     }
   });
-};
+}; 

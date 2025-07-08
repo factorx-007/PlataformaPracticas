@@ -3,7 +3,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
-import { FiLogOut, FiUser, FiEdit2, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
+import { FiLogOut, FiUser, FiEdit2, FiChevronDown, FiMenu, FiX, FiHome, FiFileText, FiBriefcase, FiUsers, FiBookOpen } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,10 +11,10 @@ import { useAuth } from '../../context/auth/AuthContext';
 
 // Navigation items with icons and paths
 const navItems = [
-  { name: 'Inicio', path: '/dashboard', icon: '🏠' },
-  { name: 'Postulaciones', path: '/dashboard/postulaciones', icon: '📝' },
-  { name: 'Ofertas', path: '/dashboard/ofertas', icon: '💼' },
-  { name: 'Empresas', path: '/dashboard/empresas', icon: '🏢' },
+  { name: 'Inicio', path: '/dashboard', icon: <FiHome className="w-5 h-5" /> },
+  { name: 'Postulaciones', path: '/dashboard/postulaciones', icon: <FiFileText className="w-5 h-5" /> },
+  { name: 'Ofertas', path: '/dashboard/ofertas', icon: <FiBriefcase className="w-5 h-5" /> },
+  { name: 'Empresas', path: '/dashboard/empresas', icon: <FiUsers className="w-5 h-5" /> },
 ];
 
 export default function ModernNavbar() {
@@ -111,7 +111,7 @@ export default function ModernNavbar() {
                 }}
                 className="flex items-center"
               >
-                📰 Blog
+                <FiBookOpen className="w-5 h-5 mr-2" /> Blog
                 <motion.div
                   className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                   initial={{ scale: 0 }}

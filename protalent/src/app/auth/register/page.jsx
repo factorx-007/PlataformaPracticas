@@ -32,9 +32,6 @@ export default function RegisterPage() {
           transition={{ duration: 0.5 }}
           className="backdrop-blur-xl bg-white/10 border border-[#38bdf8]/20 shadow-2xl rounded-3xl p-8 md:p-10 w-full max-w-xl mx-2"
         >
-          <h2 className="text-3xl font-bold text-white text-center mb-6">
-            Registrar <span className="text-[#38bdf8]">Cuenta</span>
-          </h2>
           <AuthForm type="register" />
         </motion.div>
       </main>

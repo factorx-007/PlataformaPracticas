@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../../context/auth/AuthContext';
+import { FiMail, FiLock, FiUser, FiTag } from 'react-icons/fi';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -42,13 +43,16 @@ export default function AuthForm({ type }) {
         {type === 'register' && (
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2 text-gray-300">Nombre completo</label>
-            <input 
-              {...register('nombre')} 
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
-                errors.nombre ? 'border-red-500' : 'border-[#38bdf8]/30'
-              }`}
-              placeholder="Ej: Juan Pérez"
-            />
+            <div className="relative">
+              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                {...register('nombre')}
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
+                  errors.nombre ? 'border-red-500' : 'border-[#38bdf8]/30'
+                }`}
+                placeholder="Ej: Juan Pérez"
+              />
+            </div>
             {errors.nombre && (
               <p className="mt-1 text-sm text-red-400 animate-pulse">{errors.nombre.message}</p>
             )}
@@ -57,14 +61,17 @@ export default function AuthForm({ type }) {
         
         <div className="mb-6">
           <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
-          <input 
-            {...register('email')} 
-            type="email"
-            className={`w-full px-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
-              errors.email ? 'border-red-500' : 'border-[#38bdf8]/30'
-            }`}
-            placeholder="tucorreo@ejemplo.com"
-          />
+          <div className="relative">
+            <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              {...register('email')}
+              type="email"
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
+                errors.email ? 'border-red-500' : 'border-[#38bdf8]/30'
+              }`}
+              placeholder="tucorreo@ejemplo.com"
+            />
+          </div>
           {errors.email && (
             <p className="mt-1 text-sm text-red-400 animate-pulse">{errors.email.message}</p>
           )}
@@ -72,14 +79,17 @@ export default function AuthForm({ type }) {
         
         <div className="mb-6">
           <label className="block text-sm font-medium mb-2 text-gray-300">Contraseña</label>
-          <input 
-            {...register('password')} 
-            type="password"
-            className={`w-full px-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
-              errors.password ? 'border-red-500' : 'border-[#38bdf8]/30'
-            }`}
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              {...register('password')}
+              type="password"
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border-2 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-[#38bdf8] transition-colors ${
+                errors.password ? 'border-red-500' : 'border-[#38bdf8]/30'
+              }`}
+              placeholder="••••••••"
+            />
+          </div>
           {errors.password && (
             <p className="mt-1 text-sm text-red-400 animate-pulse">{errors.password.message}</p>
           )}
@@ -88,13 +98,16 @@ export default function AuthForm({ type }) {
         {type === 'register' && (
           <div className="mb-8">
             <label className="block text-sm font-medium mb-2 text-gray-300">Rol</label>
-            <select 
-              {...register('rol')} 
-              className="w-full px-4 py-3 rounded-lg border-2 border-[#38bdf8]/30 bg-white/10 text-white focus:outline-none focus:border-[#38bdf8] transition-colors"
-            >
-              <option value="postulante" className="bg-[#062056]">Postulante</option>
-              <option value="empresa" className="bg-[#062056]">Empresa</option>
-            </select>
+            <div className="relative">
+              <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <select
+                {...register('rol')}
+                className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-[#38bdf8]/30 bg-white/10 text-white focus:outline-none focus:border-[#38bdf8] transition-colors"
+              >
+                <option value="postulante" className="bg-[#062056]">Postulante</option>
+                <option value="empresa" className="bg-[#062056]">Empresa</option>
+              </select>
+            </div>
           </div>
         )}
 
