@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('pendiente', 'aceptada', 'rechazada'),
       defaultValue: 'pendiente',
     },
-    usuarioId: { type: DataTypes.INTEGER, allowNull: false }, // FK
-    ofertaId: { type: DataTypes.INTEGER, allowNull: false },  // FK
+    estudianteId: { type: DataTypes.INTEGER, allowNull: false }, // FK a Estudiante
+    ofertaId: { type: DataTypes.INTEGER, allowNull: false },  // FK a Oferta
   });
 };

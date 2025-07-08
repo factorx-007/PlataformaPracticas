@@ -5,6 +5,8 @@ const verifyToken = require('../middlewares/verifyToken');
 
 // 🔐 Rutas protegidas
 router.post('/', verifyToken, postulacionController.crearPostulacion);
+router.get('/mis-postulaciones', verifyToken, postulacionController.obtenerMisPostulaciones);
+router.get('/empresa-postulaciones', verifyToken, postulacionController.obtenerPostulacionesEmpresa);
 router.put('/:id', verifyToken, postulacionController.actualizarPostulacion);
 router.delete('/:id', verifyToken, postulacionController.eliminarPostulacion);
 
