@@ -7,7 +7,12 @@ module.exports = (sequelize) => {
     cv: { 
       type: DataTypes.STRING, 
       allowNull: true,
-      comment: 'Ruta/URL del archivo PDF'
+      comment: 'URL del CV en Cloudinary'
+    },
+    foto_perfil: { 
+      type: DataTypes.STRING, 
+      allowNull: true,
+      comment: 'URL de la foto de perfil en Cloudinary'
     },
     carrera: { 
       type: DataTypes.STRING, 
@@ -21,11 +26,6 @@ module.exports = (sequelize) => {
     telefono: { 
       type: DataTypes.STRING, 
       allowNull: true 
-    },
-    foto_perfil: { 
-      type: DataTypes.STRING, 
-      allowNull: true,
-      comment: 'Ruta de la imagen'
     },
     tipo: { 
       type: DataTypes.ENUM('estudiante', 'egresado'),

@@ -29,6 +29,11 @@ module.exports = (sequelize) => {
     telefono: { 
       type: DataTypes.STRING, 
       allowNull: true 
+    },
+    logo_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'URL del logo en Cloudinary'
     }
   });
 };

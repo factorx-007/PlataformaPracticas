@@ -12,6 +12,7 @@ const preguntaOfertaRoutes = require('./preguntaOferta');
 const categoriaRoutes = require('./categoria');
 const blogPostRoutes = require('./blogPost');
 const comentarioRoutes = require('./comentario');
+const uploadRoutes = require('./upload');
 
 router.get('/', saludo);
 router.use('/auth', authRoutes); 
@@ -23,5 +24,6 @@ router.use('/preguntas-oferta', preguntaOfertaRoutes);
 router.use('/categorias', categoriaRoutes);
 router.use('/posts', blogPostRoutes);
 router.use('/comentarios', comentarioRoutes);
+router.use('/upload', uploadRoutes);
 
 module.exports = router;
