@@ -1,7 +1,6 @@
 //src/controllers/authController.js
 const bcrypt = require('bcryptjs');
-const { Usuario, Estudiante, Empresa } = require('../models');
-const { Op } = require('sequelize');
+const { prisma } = require('../config/database');
 const { OAuth2Client } = require('google-auth-library');
 const generateToken = require('../utils/generateToken');
 
@@ -13,7 +12,7 @@ const register = async (req, res) => {
   const { nombre, email, password, rol, carrera, tipo, ruc, nombre_empresa, rubro } = req.body;
 
   try {
-    const existe = await Usuario.findOne({ where: { email } });
+    const existe = await prisma.usuario.findUnique({ where: { email } });
     if (existe) return res.status(400).json({ error: 'El email ya está en uso' });
 
     // Validaciones específicas por rol
@@ -27,41 +26,52 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Crear usuario base
-    const user = await Usuario.create({
-      nombre,
-      email,
-      password: hashedPassword,
-      rol,
+    // Crear usuario base con perfil específico en una transacción
+    const result = await prisma.$transaction(async (tx) => {
+      // Crear usuario base
+      const user = await tx.usuario.create({
+        data: {
+          nombre,
+          email,
+          password: hashedPassword,
+          rol: rol.toUpperCase(),
+        }
+      });
+
+      let perfil = null;
+
+      // Crear perfil específico según el rol
+      if (rol === 'estudiante' || rol === 'egresado') {
+        perfil = await tx.estudiante.create({
+          data: {
+            usuarioId: user.id,
+            carrera,
+            tipo: (tipo || rol).toUpperCase(),
+          }
+        });
+      } else if (rol === 'empresa') {
+        perfil = await tx.empresa.create({
+          data: {
+            usuarioId: user.id,
+            ruc,
+            nombre_empresa,
+            rubro,
+          }
+        });
+      }
+
+      return { user, perfil };
     });
-
-    let perfil = null;
-
-    // Crear perfil específico según el rol
-    if (rol === 'estudiante' || rol === 'egresado') {
-      perfil = await Estudiante.create({
-        usuarioId: user.id,
-        carrera,
-        tipo: tipo || rol, // usar el tipo proporcionado o el rol como fallback
-      });
-    } else if (rol === 'empresa') {
-      perfil = await Empresa.create({
-        usuarioId: user.id,
-        ruc,
-        nombre_empresa,
-        rubro,
-      });
-    }
 
     res.status(201).json({ 
       mensaje: 'Usuario registrado con éxito', 
       user: {
-        id: user.id,
-        nombre: user.nombre,
-        email: user.email,
-        rol: user.rol,
+        id: result.user.id,
+        nombre: result.user.nombre,
+        email: result.user.email,
+        rol: result.user.rol.toLowerCase(),
       },
-      perfil
+      perfil: result.perfil
     });
   } catch (err) {
     res.status(500).json({ error: 'Error en el registro', detalle: err.message });
@@ -73,7 +83,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await Usuario.findOne({ where: { email } });
+    const user = await prisma.usuario.findUnique({ where: { email } });
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -88,7 +98,7 @@ const login = async (req, res) => {
         id: user.id,
         nombre: user.nombre,
         email: user.email,
-        rol: user.rol,
+        rol: user.rol.toLowerCase(),
       },
     });
   } catch (err) {
@@ -104,32 +114,58 @@ const perfil = async (req, res) => {
       return res.status(401).json({ error: 'No autorizado o ID de usuario no encontrado en token' });
     }
 
-    const user = await Usuario.findByPk(req.user.id, {
-      attributes: ['id', 'nombre', 'email', 'rol'],
-      include: [
-        {
-          model: Estudiante,
-          required: false,
-          attributes: ['id', 'carrera', 'año_egreso', 'telefono', 'tipo', 'cv', 'foto_perfil']
+    const user = await prisma.usuario.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        nombre: true,
+        email: true,
+        rol: true,
+        estudiante: {
+          select: {
+            id: true,
+            carrera: true,
+            año_egreso: true,
+            telefono: true,
+            tipo: true,
+            cv: true,
+            foto_perfil: true
+          }
         },
-        {
-          model: Empresa,
-          required: false,
-          attributes: ['id', 'ruc', 'nombre_empresa', 'rubro', 'descripcion', 'direccion', 'telefono']
+        empresa: {
+          select: {
+            id: true,
+            ruc: true,
+            nombre_empresa: true,
+            rubro: true,
+            descripcion: true,
+            direccion: true,
+            telefono: true
+          }
         }
-      ]
+      }
     });
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado con el ID proporcionado' });
     }
 
+    // Convertir enum values to lowercase para mantener compatibilidad
+    const userResponse = {
+      ...user,
+      rol: user.rol.toLowerCase(),
+      estudiante: user.estudiante ? {
+        ...user.estudiante,
+        tipo: user.estudiante.tipo.toLowerCase()
+      } : user.estudiante
+    };
+
     res.json({ 
       mensaje: 'Perfil del usuario', 
-      user
+      user: userResponse
     });
   } catch (err) {
-    console.error("Error en /perfil:", err); // Loguear el error en backend es útil
+    console.error("Error en /perfil:", err);
     res.status(500).json({ error: 'Error al obtener perfil', detalle: err.message });
   }
 };
@@ -173,9 +209,9 @@ const googleAuth = async (req, res) => {
     }
 
     // Buscar usuario existente por googleId o email
-    let user = await Usuario.findOne({ 
+    let user = await prisma.usuario.findFirst({ 
       where: { 
-        [Op.or]: [
+        OR: [
           { googleId },
           { email }
         ]
@@ -186,37 +222,48 @@ const googleAuth = async (req, res) => {
       // Usuario existente
       if (!user.googleId) {
         // Vincular cuenta existente con Google
-        await user.update({ googleId });
+        user = await prisma.usuario.update({
+          where: { id: user.id },
+          data: { googleId }
+        });
       }
       
       // Actualizar información si es necesario
       if (user.nombre !== nombre) {
-        await user.update({ nombre });
+        user = await prisma.usuario.update({
+          where: { id: user.id },
+          data: { nombre }
+        });
       }
     } else {
       // Nuevo usuario - crear con Google
-      user = await Usuario.create({
-        nombre,
-        email,
-        googleId,
-        rol,
-        password: null, // No tiene contraseña
-        perfilCompleto: false
+      user = await prisma.usuario.create({
+        data: {
+          nombre,
+          email,
+          googleId,
+          rol: rol.toUpperCase(),
+          password: null,
+          perfilCompleto: false
+        }
       });
     }
 
     // Verificar si tiene perfil específico completo
     let perfilEspecifico = null;
-    if (user.rol === 'empresa') {
-      perfilEspecifico = await Empresa.findOne({ where: { usuarioId: user.id } });
-    } else if (user.rol === 'estudiante' || user.rol === 'egresado') {
-      perfilEspecifico = await Estudiante.findOne({ where: { usuarioId: user.id } });
+    if (user.rol === 'EMPRESA') {
+      perfilEspecifico = await prisma.empresa.findUnique({ where: { usuarioId: user.id } });
+    } else if (user.rol === 'ESTUDIANTE' || user.rol === 'EGRESADO') {
+      perfilEspecifico = await prisma.estudiante.findUnique({ where: { usuarioId: user.id } });
     }
 
     // Actualizar perfilCompleto si es necesario
     const tienePerfilCompleto = !!perfilEspecifico;
     if (user.perfilCompleto !== tienePerfilCompleto) {
-      await user.update({ perfilCompleto: tienePerfilCompleto });
+      user = await prisma.usuario.update({
+        where: { id: user.id },
+        data: { perfilCompleto: tienePerfilCompleto }
+      });
     }
 
     const token = generateToken({ id: user.id, rol: user.rol });
@@ -228,13 +275,13 @@ const googleAuth = async (req, res) => {
         id: user.id,
         nombre: user.nombre,
         email: user.email,
-        rol: user.rol,
+        rol: user.rol.toLowerCase(),
         perfilCompleto: tienePerfilCompleto,
         picture // URL de la foto de Google
       },
       necesitaCompletarPerfil: !tienePerfilCompleto,
       redirectTo: !tienePerfilCompleto ? 
-        (user.rol === 'empresa' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
+        (user.rol === 'EMPRESA' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
         '/dashboard'
     });
   } catch (error) {
@@ -250,13 +297,13 @@ const completarPerfilEmpresa = async (req, res) => {
     const usuarioId = req.user.id;
 
     // Verificar que sea una empresa
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario || usuario.rol !== 'empresa') {
+    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId } });
+    if (!usuario || usuario.rol !== 'EMPRESA') {
       return res.status(403).json({ error: 'Solo empresas pueden completar este perfil' });
     }
 
     // Verificar que no tenga ya un perfil
-    const empresaExistente = await Empresa.findOne({ where: { usuarioId } });
+    const empresaExistente = await prisma.empresa.findUnique({ where: { usuarioId } });
     if (empresaExistente) {
       return res.status(400).json({ error: 'El perfil de empresa ya existe' });
     }
@@ -266,23 +313,32 @@ const completarPerfilEmpresa = async (req, res) => {
       return res.status(400).json({ error: 'RUC debe tener 11 dígitos' });
     }
 
-    // Crear perfil de empresa
-    const empresa = await Empresa.create({
-      usuarioId,
-      ruc,
-      nombre_empresa,
-      rubro,
-      descripcion,
-      direccion,
-      telefono
-    });
+    // Crear perfil de empresa en una transacción
+    const result = await prisma.$transaction(async (tx) => {
+      const empresa = await tx.empresa.create({
+        data: {
+          usuarioId,
+          ruc,
+          nombre_empresa,
+          rubro,
+          descripcion,
+          direccion,
+          telefono
+        }
+      });
 
-    // Marcar perfil como completo
-    await usuario.update({ perfilCompleto: true });
+      // Marcar perfil como completo
+      await tx.usuario.update({
+        where: { id: usuarioId },
+        data: { perfilCompleto: true }
+      });
+
+      return empresa;
+    });
 
     res.status(201).json({
       mensaje: 'Perfil de empresa completado exitosamente',
-      empresa
+      empresa: result
     });
   } catch (error) {
     res.status(500).json({ error: 'Error al completar perfil de empresa', detalle: error.message });
@@ -294,41 +350,71 @@ const verificarEstadoPerfil = async (req, res) => {
   try {
     const userId = req.user.id;
     
-    const user = await Usuario.findByPk(userId, {
-      attributes: ['id', 'nombre', 'email', 'rol', 'perfilCompleto'],
-      include: [
-        {
-          model: Estudiante,
-          required: false,
-          attributes: ['id', 'carrera', 'año_egreso', 'telefono', 'tipo', 'cv', 'foto_perfil']
+    const user = await prisma.usuario.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        nombre: true,
+        email: true,
+        rol: true,
+        perfilCompleto: true,
+        estudiante: {
+          select: {
+            id: true,
+            carrera: true,
+            año_egreso: true,
+            telefono: true,
+            tipo: true,
+            cv: true,
+            foto_perfil: true
+          }
         },
-        {
-          model: Empresa,
-          required: false,
-          attributes: ['id', 'ruc', 'nombre_empresa', 'rubro', 'descripcion', 'direccion', 'telefono']
+        empresa: {
+          select: {
+            id: true,
+            ruc: true,
+            nombre_empresa: true,
+            rubro: true,
+            descripcion: true,
+            direccion: true,
+            telefono: true
+          }
         }
-      ]
+      }
     });
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    const tienePerfilEspecifico = !!(user.Estudiante || user.Empresa);
+    const tienePerfilEspecifico = !!(user.estudiante || user.empresa);
     
     // Actualizar perfilCompleto si es necesario
     if (user.perfilCompleto !== tienePerfilEspecifico) {
-      await user.update({ perfilCompleto: tienePerfilEspecifico });
-      user.perfilCompleto = tienePerfilEspecifico;
+      await prisma.usuario.update({
+        where: { id: userId },
+        data: { perfilCompleto: tienePerfilEspecifico }
+      });
     }
+
+    // Convertir enum values to lowercase para mantener compatibilidad
+    const userResponse = {
+      ...user,
+      rol: user.rol.toLowerCase(),
+      estudiante: user.estudiante ? {
+        ...user.estudiante,
+        tipo: user.estudiante.tipo.toLowerCase()
+      } : user.estudiante,
+      perfilCompleto: tienePerfilEspecifico
+    };
 
     res.json({
       mensaje: 'Estado del perfil del usuario',
-      user,
+      user: userResponse,
       perfilCompleto: tienePerfilEspecifico,
       necesitaCompletarPerfil: !tienePerfilEspecifico,
       redirectTo: !tienePerfilEspecifico ? 
-        (user.rol === 'empresa' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
+        (user.rol === 'EMPRESA' ? '/auth/completar-perfil-empresa' : '/perfil/completar') : 
         null
     });
   } catch (error) {

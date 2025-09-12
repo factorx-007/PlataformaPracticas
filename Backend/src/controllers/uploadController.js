@@ -1,6 +1,6 @@
 // src/controllers/uploadController.js
 const { uploadFile, deleteFile, getOptimizedUrl } = require('../config/cloudinary');
-const { Usuario, Estudiante, Empresa, BlogPost } = require('../models');
+const { prisma } = require('../config/database');
 
 // Upload de foto de perfil de estudiante
 const uploadFotoPerfil = async (req, res) => {
@@ -14,13 +14,16 @@ const uploadFotoPerfil = async (req, res) => {
     const publicId = req.file.filename;
 
     // Encontrar el estudiante del usuario
-    const estudiante = await Estudiante.findOne({ where: { usuarioId: userId } });
+    const estudiante = await prisma.estudiante.findFirst({ where: { usuarioId: userId } });
     if (!estudiante) {
       return res.status(404).json({ error: 'Perfil de estudiante no encontrado' });
     }
 
     // Actualizar la foto de perfil del estudiante
-    await estudiante.update({ foto_perfil: fileUrl });
+    await prisma.estudiante.update({
+      where: { id: estudiante.id },
+      data: { foto_perfil: fileUrl }
+    });
 
     res.json({
       mensaje: 'Foto de perfil actualizada correctamente',
@@ -45,13 +48,16 @@ const uploadLogo = async (req, res) => {
     const publicId = req.file.filename;
 
     // Encontrar la empresa del usuario
-    const empresa = await Empresa.findOne({ where: { usuarioId: userId } });
+    const empresa = await prisma.empresa.findFirst({ where: { usuarioId: userId } });
     if (!empresa) {
       return res.status(404).json({ error: 'Empresa no encontrada' });
     }
 
     // Actualizar el logo de la empresa
-    await empresa.update({ logo_url: fileUrl });
+    await prisma.empresa.update({
+      where: { id: empresa.id },
+      data: { logo_url: fileUrl }
+    });
 
     res.json({
       mensaje: 'Logo actualizado correctamente',
@@ -76,13 +82,16 @@ const uploadCV = async (req, res) => {
     const publicId = req.file.filename;
 
     // Encontrar el estudiante del usuario
-    const estudiante = await Estudiante.findOne({ where: { usuarioId: userId } });
+    const estudiante = await prisma.estudiante.findFirst({ where: { usuarioId: userId } });
     if (!estudiante) {
       return res.status(404).json({ error: 'Perfil de estudiante no encontrado' });
     }
 
     // Actualizar el CV del estudiante
-    await estudiante.update({ cv: fileUrl });
+    await prisma.estudiante.update({
+      where: { id: estudiante.id },
+      data: { cv: fileUrl }
+    });
 
     res.json({
       mensaje: 'CV actualizado correctamente',

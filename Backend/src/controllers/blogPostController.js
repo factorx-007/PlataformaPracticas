@@ -1,8 +1,10 @@
-const { BlogPost, Categoria } = require('../models');
+const { prisma } = require('../config/database');
 
 exports.crearPost = async (req, res) => {
   try {
-    const nuevoPost = await BlogPost.create(req.body);
+    const nuevoPost = await prisma.blogPost.create({
+      data: req.body
+    });
     res.status(201).json({ mensaje: 'Post creado', post: nuevoPost });
   } catch (error) {
     res.status(500).json({ error: 'Error al crear post', detalle: error.message });
@@ -11,8 +13,12 @@ exports.crearPost = async (req, res) => {
 
 exports.obtenerPosts = async (req, res) => {
   try {
-    const posts = await BlogPost.findAll({
-      include: { model: Categoria, attributes: ['nombre'] }
+    const posts = await prisma.blogPost.findMany({
+      include: {
+        categoria: {
+          select: { nombre: true }
+        }
+      }
     });
     res.json(posts);
   } catch (error) {
@@ -22,8 +28,13 @@ exports.obtenerPosts = async (req, res) => {
 
 exports.obtenerPostPorId = async (req, res) => {
   try {
-    const post = await BlogPost.findByPk(req.params.id, {
-      include: { model: Categoria, attributes: ['nombre'] }
+    const post = await prisma.blogPost.findUnique({
+      where: { id: parseInt(req.params.id) },
+      include: {
+        categoria: {
+          select: { nombre: true }
+        }
+      }
     });
     if (!post) return res.status(404).json({ error: 'Post no encontrado' });
     res.json(post);
@@ -34,11 +45,14 @@ exports.obtenerPostPorId = async (req, res) => {
 
 exports.actualizarPost = async (req, res) => {
   try {
-    const post = await BlogPost.findByPk(req.params.id);
+    const post = await prisma.blogPost.findUnique({ where: { id: parseInt(req.params.id) } });
     if (!post) return res.status(404).json({ error: 'Post no encontrado' });
 
-    await post.update(req.body);
-    res.json({ mensaje: 'Post actualizado', post });
+    const postActualizado = await prisma.blogPost.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body
+    });
+    res.json({ mensaje: 'Post actualizado', post: postActualizado });
   } catch (error) {
     res.status(500).json({ error: 'Error al actualizar post' });
   }
@@ -46,10 +60,10 @@ exports.actualizarPost = async (req, res) => {
 
 exports.eliminarPost = async (req, res) => {
   try {
-    const post = await BlogPost.findByPk(req.params.id);
+    const post = await prisma.blogPost.findUnique({ where: { id: parseInt(req.params.id) } });
     if (!post) return res.status(404).json({ error: 'Post no encontrado' });
 
-    await post.destroy();
+    await prisma.blogPost.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ mensaje: 'Post eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar post' });

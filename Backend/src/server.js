@@ -1,7 +1,7 @@
 // server.js
 const app = require('./app');
 const dotenv = require('dotenv');
-const { sequelize } = require('./models');
+const { connectDatabase } = require('./config/database');
 const { validateGoogleConfig } = require('./config/google');
 const { validateCloudinaryConfig } = require('./config/cloudinary');
 
@@ -10,12 +10,8 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('✅ Conexión a MySQL establecida con éxito');
-
-    await sequelize.sync();
-    console.log('📦 Modelos sincronizados con la base de datos');
-
+    await connectDatabase();
+    
     // Validar configuración de Google OAuth
     validateGoogleConfig();
     

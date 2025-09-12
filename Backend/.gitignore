@@ -26,3 +26,5 @@ Thumbs.db
 # Sequelize migration stuff (si no quieres subirlo)
 migrations/
 seeders/
+
+/src/generated/prisma
